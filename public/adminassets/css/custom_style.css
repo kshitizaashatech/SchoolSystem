@@ -1,0 +1,425 @@
+:root {
+    --background-gradient: linear-gradient(178deg, #ffff33 10%, #3333ff);
+    --gray: #34495e;
+    --darkgray: #2c3e50;
+    --opaquedarkgray: #2c3e50ea;
+}
+
+
+/* new custom css */
+.report-table-container {
+    height: 800px;
+    overflow: auto;
+}
+
+#releases-table thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 2;
+}
+
+.hr-line-dashed {
+    border-top: 1px dashed #e7eaec;
+    color: #ffffff;
+    background-color: #ffffff;
+    height: 1px;
+    margin: 20px 0;
+}
+
+.must {
+    color: red;
+}
+
+.label-input>label {
+    font-size: 14px;
+
+    /* border: 2px solid red; */
+}
+
+.single-input-modal>.single-input-text {
+    width: 100%;
+    border-radius: 6px;
+    padding: 5px;
+}
+
+
+/* For Button Active and Inactive */
+.btn-group input[value="1"]:checked+.btn-secondary {
+    background-color: blue;
+    color: white;
+}
+
+.btn-group input[value="0"]:checked+.btn-secondary {
+    background-color: red;
+    /* or any other color you want for the Inactive state */
+    color: white;
+}
+
+
+/* Style the form */
+#regForm {
+    background-color: #ffffff;
+    /* margin: 30px auto; */
+    /* padding: 20px; */
+    width: 100%;
+    min-width: 300px;
+}
+
+/* Style the input fields */
+/* #regForm > .tab > p > input {
+  padding: 10px;
+  width: 100%;
+  font-size: 17px;
+  font-family: Raleway;
+  border: 1px solid #aaaaaa;
+} */
+
+/* Mark input boxes that gets an error on validation: */
+input.invalid {
+    background-color: #ffdddd;
+}
+
+/* Hide all steps by default: */
+.tab {
+    display: none;
+}
+
+/* Make circles that indicate the steps of the form: */
+.step {
+    /* height: 15px; */
+    /* width: 15px; */
+    /* margin: 0 2px; */
+    background-color: rgb(94, 110, 130);
+    /* border: none; */
+    border-radius: 8px;
+    display: inline-block;
+    opacity: 0.4;
+    padding: 4px 8px 4px 8px;
+    color: white;
+    font-family: Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Mark the active step: */
+.step.active {
+    opacity: 1;
+}
+
+/* Mark the steps that are finished and valid: */
+.step.finish {
+    background-color: rgb(0, 210, 122);
+    opacity: 1;
+}
+
+
+select {
+    /* Reset Select */
+    appearance: none;
+    outline: 10px red;
+    border: 0;
+    box-shadow: none;
+    /* Personalize */
+    flex: 1;
+    padding: 0 1em;
+    color: #fff;
+    background-color: var(--opaquedarkgray);
+    background-image: none;
+    cursor: pointer;
+}
+
+/* Remove IE arrow */
+select::-ms-expand {
+    display: none;
+}
+
+/* Custom Select wrapper */
+.selectinput {
+    /* position: relative; */
+    display: flex;
+    width: 17em;
+    height: 2em;
+    border-radius: .25em;
+    /* border: 1px solid black; */
+    overflow: hidden;
+    font-family: Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.select {
+    position: relative;
+    display: flex;
+    width: 17em;
+    height: 2em;
+    border-radius: .25em;
+    /* border: 1px solid black; */
+    overflow: hidden;
+    font-family: Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Arrow */
+.select::after {
+    content: '\25BC';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.25em;
+    background-color: #34495e7c;
+    transition: .25s all ease;
+    pointer-events: none;
+}
+
+/* Transition */
+.select:hover::after {
+    color: white;
+}
+
+.checkbox-container {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.l-checkbox {
+    padding: 6px;
+    border-radius: 50px;
+    /* display: inline-flex; */
+    cursor: pointer;
+    transition: background .2s ease;
+    margin: 8px 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.l-checkbox:hover,
+.l-checkbox:focus-within {
+    background: #2c3e5023;
+}
+
+
+.l-checkbox input {
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background: none;
+    border: 0;
+    box-shadow: inset 0 0 0 1px #2c3e50, inset 0 0 0 1.5px #2c3e50;
+    appearance: none;
+    padding: 0;
+    margin: 0;
+    transition: box-shadow 150ms cubic-bezier(.95, .15, .5, 1.25);
+    pointer-events: none;
+}
+
+.l-checkbox input:focus {
+    outline: none;
+}
+
+.l-checkbox input:checked {
+    box-shadow: inset 0 0 0 6px #2c3e50;
+}
+
+.l-checkbox span {
+    vertical-align: middle;
+    /* display: inline-block; */
+    line-height: 20px;
+    padding: 0 8px;
+}
+
+
+.attendance-radio {
+    padding: 3px;
+    border-radius: 50px;
+    display: inline-flex;
+    cursor: pointer;
+    transition: background .2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.attendance-radio:hover,
+.attendance-radio:focus-within {
+    background: #2c3e5023;
+}
+
+.attendance-radio input {
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background: none;
+    border: 0;
+    box-shadow: inset 0 0 0 1px #2c3e50, inset 0 0 0 1.5px #2c3e50;
+    appearance: none;
+    padding: 0;
+    margin: 0;
+    transition: box-shadow 150ms cubic-bezier(.95, .15, .5, 1.25);
+    pointer-events: none;
+}
+
+.attendance-radio input:focus {
+    outline: none;
+}
+
+.attendance-radio input:checked {
+    box-shadow: inset 0 0 0 6px #2c3e50;
+}
+
+.attendance-radio span {
+    vertical-align: middle;
+    display: inline-block;
+    line-height: 20px;
+    padding: 0 8px;
+}
+
+.l-radio {
+    padding: 6px;
+    border-radius: 50px;
+    display: inline-flex;
+    cursor: pointer;
+    transition: background .2s ease;
+    margin: 8px 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.l-radio:hover,
+.l-radio:focus-within {
+    background: #2c3e5023;
+}
+
+.l-radio input {
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background: none;
+    border: 0;
+    box-shadow: inset 0 0 0 1px #2c3e50, inset 0 0 0 1.5px #2c3e50;
+    appearance: none;
+    padding: 0;
+    margin: 0;
+    transition: box-shadow 150ms cubic-bezier(.95, .15, .5, 1.25);
+    pointer-events: none;
+}
+
+.l-radio input:focus {
+    outline: none;
+}
+
+.l-radio input:checked {
+    box-shadow: inset 0 0 0 6px #2c3e50;
+}
+
+.l-radio span {
+    vertical-align: middle;
+    display: inline-block;
+    line-height: 20px;
+    padding: 0 8px;
+}
+
+.form-control {
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+
+
+/* for model pop up for marksheet design */
+.denifittable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    text-transform: uppercase;
+    border: 2px solid black;
+}
+
+.denifittable th,
+.denifittable td {
+    border: 1px solid black;
+}
+
+.denifittable th {
+    width: 35%;
+}
+
+.denifittable td {
+    text-align: left;
+}
+
+.denifittable td:last-child {
+    border-right: 1px solid #999;
+}
+
+.denifittable tr:last-child td {
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+}
+
+/* for marksheet design */
+.main-div-marksheet {
+    display: flex;
+    justify-content: space-around;
+    /* Distribute items with space around */
+    padding: 0 20px;
+    /* Adjust the amount of space on the left and right sides */
+}
+
+.left-sign,
+.middle-sign,
+.right-sign {
+    flex-grow: 1;
+    /* Each item takes up equal space */
+}
+
+.left-sign,
+.middle-sign,
+.right-sign {
+    flex-grow: 1;
+    /* Each item takes up equal space */
+    width: 100px;
+    /* Specify the width of the image */
+    height: 100px;
+    /* Specify the height of the image */
+}
+
+.left-sign img,
+.middle-sign img,
+.right-sign img {
+    width: 100%;
+    /* Ensure the image fills the entire space of its parent div */
+    height: 100%;
+    /* Ensure the image fills the entire space of its parent div */
+    object-fit: cover;
+    /* Preserve aspect ratio and cover the entire container */
+}
+
+.bg-gray {
+    background-color: #f8f9fa;
+    border: 1px solid #6c757d;
+    padding: 10px;
+}
+
+.en_ne{
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+
+}
+
+
+.btn_en {
+    background-color: blue;
+    border-radius: 20px;
+    width: 80px;
+    height: 80px;
+    padding: 5px;
+    color: white;
+}
+
+
+.btn_en.active {
+    background-color: red;
+}
+.btn_en:hover {
+    color: black;
+}
+
+

@@ -1,0 +1,117 @@
+html {
+  font-size: 14px;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* Media Query for min-width: 768px */
+@media screen and (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Import Font */
+@import url('https://fonts.cdnfonts.com/css/algeria');
+
+/* Define CSS Variables */
+:root {
+  --input-color: rgb(39, 60, 223);
+}
+
+/* Selectors with multiple classes */
+.s_name,
+.s_exam,
+.s_estd,
+.s_sheet,
+.s_address,
+.s_state,
+.s_name,
+.s_address,
+.s_state,
+.s_estd,
+.s_exam,
+.s_sheet,
+.input,
+.first-input,
+.interval-grades,
+.one-credit,
+.foot-input {
+  color: rgb(39, 60, 223); /* Fallback if variables are not supported */
+}
+
+/* Specific Styles */
+.s_name,
+.s_exam,
+.s_estd,
+.s_sheet {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.s_address,
+.s_state {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.gradesheet {
+  border: 5px solid rgb(39, 60, 223); /* Fallback if variables are not supported */
+}
+
+.gradesheet_design {
+  border: 2px solid rgb(39, 60, 223); /* Fallback if variables are not supported */
+  padding: 20px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.gradesheet_logo {
+  margin-top: 55px;
+  height: 150px;
+}
+
+.foot-input {
+  border-top: 1px dashed rgb(39, 60, 223); /* Fallback if variables are not supported */
+}
+
+.one-credit {
+  line-height: 30px;
+}
+
+.interval-grades {
+  height: 40px;
+  line-height: 1px;
+}
+
+.output {
+  border-bottom: 1px dashed rgb(39, 60, 223); /* Fallback if variables are not supported */
+}
+
+.first-input,
+.output {
+  padding: 0px 0px;
+  height: 25px;
+}
+
+/* Specific styles for classes .credit and .grade */
+.credit,
+.grade {
+  border: 1px solid red;
+  width: 10px;
+}
+
+/* Specific style for class .s_sheet */
+.s_sheet {
+  font-family: 'Algeria', sans-serif;
+  font-size: 40px;
+}
