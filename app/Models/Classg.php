@@ -25,8 +25,8 @@ class Classg extends Model
 
     public function sections()
     {
-        // return $this->hasMany(Section::class, 'class_sections', 'class_id');
-        return $this->belongsToMany(Section::class, 'class_sections', 'class_id', 'section_id');
+        return $this->belongsToMany(Section::class, 'class_sections', 'class_id', 'section_id')
+                    ->withPivot('school_id');
     }
 
     public function subjectGroups()

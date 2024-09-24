@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gradesheet</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -14,32 +13,28 @@
             --input-color: rgb(39, 60, 223);
         }
 
-        .s_name,
-        .s_exam,
-        .s_estd,
-        .s_sheet {
+        body {
             font-family: "Times New Roman", Times, serif;
+        }
+
+        .s_name, .s_exam, .s_estd, .s_sheet {
             font-size: 25px;
             font-weight: bolder;
         }
 
-        .s_address,
-        .s_state {
-            font-family: "Times New Roman", Times, serif;
+        .s_address, .s_state {
             font-size: 15px;
             font-weight: bolder;
         }
 
         .gradesheet {
             border: 5px solid var(--input-color);
-
         }
 
         .gradesheet_design {
             border: 2px solid var(--input-color);
             padding: 20px;
-            margin-top: 15px;
-            margin-bottom: 15px;
+            margin: 15px 0;
         }
 
         .gradesheet_logo {
@@ -47,17 +42,8 @@
             height: 150px;
         }
 
-        .s_name,
-        .s_address,
-        .s_state,
-        .s_estd,
-        .s_exam,
-        .s_sheet,
-        .input,
-        .first-input,
-        .interval-grades,
-        .one-credit,
-        .foot-input {
+        .s_name, .s_address, .s_state, .s_estd, .s_exam, .s_sheet,
+        .input, .first-input, .interval-grades, .one-credit, .foot-input {
             color: var(--input-color);
         }
 
@@ -82,21 +68,27 @@
             font-weight: bold;
         }
 
-        .first-input,
-        .output {
-            padding: 0px 0px;
+        .first-input, .output {
+            padding: 0;
             height: 25px;
-        }
-
-        .credit,
-        .grade {
-            border: 1px solid red;
-            width: 10px;
         }
 
         .s_sheet {
             font-family: 'Algeria', sans-serif;
             font-size: 40px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
@@ -151,23 +143,18 @@
                     <div class="col-md-2 first-input">
                         <p>DOB:</p>
                     </div>
-
                     <div class="col-2 output text-center">
                         <p>{{ $student->dob ?? 'N/A' }}</p>
                     </div>
-
                     <div class="col-2 first-input">
                         <p>ROLL NO:</p>
                     </div>
-
                     <div class="col-2 output text-center">
                         <p>{{ $studentDetails->roll_no ?? 'N/A' }}</p>
                     </div>
-
                     <div class="col-2 first-input">
                         <p>GRADE:</p>
                     </div>
-
                     <div class="col-2 output text-center">
                         <p>{{ $className ?? 'N/A' }} {{ $sectionName ?? 'N/A' }}</p>
                     </div>
@@ -175,7 +162,6 @@
                     <div class="col-5 first-input">
                         <p>IN THE {{ strtoupper($examinations->exam) }}</p>
                     </div>
-
                     <div class="col-4 first-input">
                         <p>ARE GIVEN BELOW.</p>
                     </div>
@@ -187,11 +173,11 @@
                             <tr>
                                 <th scope="col" class="input">S.N.</th>
                                 <th scope="col" class="input">SUBJECTS</th>
-                                <th scope="col" class="input credit">CREDIT HOUR</th>
+                                <th scope="col" class="input">CREDIT HOUR</th>
                                 <th scope="col" class="input">THEORY (50)</th>
                                 <th scope="col" class="input">INTERNAL (50)</th>
                                 <th scope="col" class="input">TOTAL (100)</th>
-                                <th scope="col" class="input grade">GRADE POINT</th>
+                                <th scope="col" class="input">GRADE POINT</th>
                                 <th scope="col" class="input">GRADE</th>
                                 <th scope="col" class="input">REMARKS</th>
                             </tr>
@@ -205,43 +191,21 @@
                                     <th scope="row" class="text-center">{{ $index + 1 }}</th>
                                     <td>{{ $result['subject_name'] }}</td>
                                     <td class="text-center">{{ $result['credit_hour'] }}</td>
+                                    <td class="text-center">{{ $result['theory_marks'] != 'N/A' ? $result['theory_marks'] : 'N/A' }}</td>
+                                    <td class="text-center">{{ $result['internal_marks'] != 'N/A' ? $result['internal_marks'] : 'N/A' }}</td>
+                                    <td class="text-center">{{ $result['total_marks'] != 'N/A' ? $result['total_marks'] : 'N/A' }}</td>
+                                    <td class="text-center">{{ $result['gpa'] }}</td>
                                     <td class="text-center">
-                                        @if ($result['theory_assessment'] == 0)
-                                            0
-                                        @else
-                                            {{ $result['theory_assessment'] }}
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($result['internal_assessment'] == 0)
-                                            0
-                                        @else
-                                            {{ $result['internal_assessment'] }}
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($result['total'] == 0)
-                                            0
-                                        @else
-                                            {{ $result['total'] }}
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($result['theory_assessment'] == 0 || $result['internal_assessment'] == 0 || $result['total'] == 0)
-                                            0
-                                        @else
-                                            {{ $result['grade']['grade_points_to'] }}
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($result['theory_assessment'] == 0 || $result['internal_assessment'] == 0 || $result['total'] == 0)
+                                        @if ($result['gpa'] == 'N/A')
+                                            N/A
+                                        @elseif ($result['theory_marks'] == 0 || $result['internal_marks'] == 0 || $result['total_marks'] == 0)
                                             0
                                         @else
                                             {{ $result['grade']['grade_name'] }}
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($result['theory_assessment'] == 0 || $result['internal_assessment'] == 0 || $result['total'] == 0)
+                                        @if ($result['theory_marks'] == 0 || $result['internal_marks'] == 0 || $result['total_marks'] == 0)
                                             N/A
                                         @else
                                             {{ $result['grade']['achievement_description'] }}
@@ -249,22 +213,17 @@
                                     </td>
                                 </tr>
                                 @php
-                                    if ($result['theory_assessment'] != 0 || $result['internal_assessment'] != 0 || $result['total'] != 0) {
+                                    if ($result['gpa'] != 'N/A') {
                                         $allZero = false;
                                     }
                                 @endphp
                             @endforeach
                         </tbody>
-                        
                         <tfoot>
                             <tr>
                                 <td class="text-right" colspan="9">
                                     <b><span class="input">GRADE POINT AVERAGE (GPA):</span>
-                                        @if ($allZero)
-                                            0.00
-                                        @else
-                                            {{ number_format($gpa, 2) }}
-                                        @endif
+                                        {{ $allZero ? '0.00' : number_format($overallGPA, 2) }}
                                     </b>
                                 </td>
                             </tr>
@@ -272,29 +231,26 @@
                     </table>
                 </div>
                 <div class="row">
-                    <div class="col-6 ">
+                    <div class="col-6">
                         <p class="one-credit">
                             1. One Credit Hour Equals To 32 Working Hours. <br>
-                            2. INTERNAL <b>(IN)</b>: This Covers The Participation Practical/Project
-                            Works & Terminal Examination.<br>
+                            2. INTERNAL <b>(IN)</b>: This Covers The Participation Practical/Project Works & Terminal Examination.<br>
                             3. EXTERNAL <b>(TH)</b>: This Covers Written External Examination.<br>
-                            4. <b>ABS</b>: Absent &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5. <b>*NG</b> :
-                            Not Graded<br>
-                            6. <b>GPA</b> = Σ ( Credit Hour × Grade Point )/Total Credit Hour Of The
-                            Grade
-
+                            4. <b>ABS</b>: Absent &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5. <b>*NG</b> : Not Graded<br>
+                            6. <b>GPA</b> = Σ ( Credit Hour × Grade Point )/Total Credit Hour Of The Grade
                         </p>
                         <p>
                             <span class="input"> Attendance:</span> 66.82% <br>
                             <span class="input">Result:</span> Upgraded
-
                         </p>
                     </div>
 
                     <div class="col-6">
                         <table class="table table-bordered interval-grades">
                             <thead>
-                                <p class="text-center  input"> Interval And Grades</p>
+                                <tr>
+                                    <th colspan="4" class="text-center input">Interval And Grades</th>
+                                </tr>
                                 <tr>
                                     <th scope="col">S.N.</th>
                                     <th scope="col">Interval In %</th>
@@ -302,28 +258,19 @@
                                     <th scope="col">Detail</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 @foreach ($markgrades as $grade)
                                     <tr>
                                         <th scope="row">{{ $grade->id }}</th>
-                                        <td>
-                                            {{ $grade->percentage_from }} -
-                                            {{ $grade->percentage_to }}
-                                        </td>
-                                        <td>
-                                            {{ $grade->grade_name }}
-                                        </td>
-                                        <td>
-                                            {{ $grade->achievement_description }}
-                                        </td>
+                                        <td>{{ $grade->percentage_from }} - {{ $grade->percentage_to }}</td>
+                                        <td>{{ $grade->grade_name }}</td>
+                                        <td>{{ $grade->achievement_description }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
-
 
                 <div class="row text-center mt-5 justify-content-around">
                     <div class="col-3 foot-input">
@@ -340,7 +287,6 @@
                 </div>
             </div>
         </div>
-
     </section>
 </body>
 

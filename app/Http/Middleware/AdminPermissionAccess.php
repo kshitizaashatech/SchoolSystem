@@ -36,7 +36,7 @@ class AdminPermissionAccess
                 // dd($request);
                 return $next($request);
             }
-            abort(403, 'Unauthorized action.');
+            // abort(403, 'Unauthorized action.');
         }
         return $next($request);
     }

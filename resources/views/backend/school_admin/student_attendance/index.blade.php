@@ -118,14 +118,14 @@
                             </div>
                         </div>
                         <!-- Search input -->
-                        <div class="row mb-2">
+                        {{-- <div class="row mb-2">
                             <div class="col-sm-3 col-md-3 col-3 d-flex justify-content-end position-relative">
                                 <div style="position: relative;">
                                     <input type="text" id="searchInput" class="form-control" placeholder="Search">
                                     <span id="clearSearchInput" class="position-absolute top-50 end-0 translate-middle-y text-muted" style="cursor: pointer;">&times;</span>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-12">
                                 <div class="report-table-container">

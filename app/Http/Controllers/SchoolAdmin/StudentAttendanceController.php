@@ -327,52 +327,50 @@ class StudentAttendanceController extends Controller
     
     public function getForDataTable($request)
     {
-        $query = StudentAttendance::with(['student', 'student.user', 'attendanceType']);
+        $query = StudentAttendance::with(['student', 'student.user', 'attendanceType'])
+            ->join('students', 'student_attendances.student_id', '=', 'students.id'); 
     
         // Apply filters
         if (isset($request['class_id']) && $request['class_id'] !== '') {
-            $query->whereHas('student', function ($q) use ($request) {
-                $q->where('class_id', $request['class_id']);
-            });
+            $query->where('students.class_id', $request['class_id']);
         }
         if (isset($request['section_id']) && $request['section_id'] !== '') {
-            $query->whereHas('student', function ($q) use ($request) {
-                $q->where('section_id', $request['section_id']);
-            });
+            $query->where('students.section_id', $request['section_id']);
         }
         if (isset($request['date']) && $request['date'] !== '') {
-            $query->whereDate('date', $request['date']);
+            $query->whereDate('student_attendances.date', $request['date']);
         }
     
-        // Handle sorting
+        // Handle sorting based on roll number
         if (isset($request['order'][0]['column'])) {
             $column = $request['columns'][$request['order'][0]['column']]['data']; // Use 'data' instead of 'name'
             $direction = $request['order'][0]['dir'];
-            
-            switch ($column) {
-                case 'admission_no':
-                case 'roll_no':
-                    $query->join('students', 'student_attendances.student_id', '=', 'students.id')
-                          ->orderBy($column, $direction);
-                    break;
-                case 'f_name':
-                    $query->join('students', 'student_attendances.student_id', '=', 'students.id')
-                          ->join('users', 'students.user_id', '=', 'users.id')
-                          ->orderBy('users.f_name', $direction);
-                    break;
-                default:
-                    $query->orderBy($column, $direction);
+    
+            // Always prioritize sorting by roll number
+            if ($column === 'roll_no') {
+                $query->orderBy('students.roll_no', $direction);
+            } else {
+                // Fallback sorting for other columns if needed
+                switch ($column) {
+                    case 'admission_no':
+                        $query->orderBy('students.admission_no', $direction);
+                        break;
+                    case 'f_name':
+                        $query->join('users', 'students.user_id', '=', 'users.id')
+                              ->orderBy('users.f_name', $direction);
+                        break;
+                    default:
+                        $query->orderBy($column, $direction);
+                }
             }
         } else {
-            // Default sorting
-            $query->join('students', 'student_attendances.student_id', '=', 'students.id')
-                  ->orderBy('students.roll_no', 'asc');
+            // Default sorting by roll number if no sorting is provided
+            $query->orderBy('students.roll_no', 'asc');
         }
     
         return $query->get();
     }
     
-
 
     public function markSchoolHoliday(Request $request)
     {

@@ -275,58 +275,6 @@ private function getGradeInfo($totalMarks, $allZero = false)
         'achievement_description' => $achievementDescription,
     ];
 }
-    
-private function getGradeInfoFinal($totalMarks, $allZero = false)
-{
-    if ($allZero) {
-        return [
-            'grade_points_to' => 0,
-            'grade_name' => 'NG',
-            'achievement_description' => 'Not Attempted',
-        ];
-    }
-
-    $gradePoint = $this->getSubjectGPAFinal($totalMarks);
-
-    $gradeName = 'NG'; 
-    $achievementDescription = 'Not Graded'; 
-
-    if ($totalMarks > 90) {
-        $gradeName = 'A+';
-        $achievementDescription = 'Outstanding';
-    } elseif ($totalMarks > 80) {
-        $gradeName = 'A';
-        $achievementDescription = 'Excellent';
-    } elseif ($totalMarks > 70) {
-        $gradeName = 'B';
-        $achievementDescription = 'Very Good';
-    } elseif ($totalMarks > 60) {
-        $gradeName = 'C';
-        $achievementDescription = 'Good';
-    } elseif ($totalMarks > 50) {
-        $gradeName = 'D';
-        $achievementDescription = 'Satisfactory';
-    } elseif ($totalMarks > 40) {
-        $gradeName = 'E';
-        $achievementDescription = 'Pass';
-    } elseif ($totalMarks > 32) {
-        $gradeName = 'F';
-        $achievementDescription = 'Below Average';
-    }
-
-    return [
-        'grade_points_to' => $gradePoint,
-        'grade_name' => $gradeName,
-        'achievement_description' => $achievementDescription,
-    ];
-}
-
-    private function calculateTotalMarks($result)
-    {
-        return ($result->participant_assessment ?? 0) +
-               ($result->practical_assessment ?? 0) +
-               ($result->theory_assessment ?? 0);
-    }
 
     public function downloadStudentMarkSheet($student_id, $class_id, $section_id, $marksheetdesign_id, $examination_id)
     {
@@ -426,73 +374,152 @@ private function getGradeInfoFinal($totalMarks, $allZero = false)
         ];
     }
     
-
-    private function processFinalExam($studentSession, $examination)
+    public function processFinalExam($studentSession, $examination)
     {
         $allExamResults = ExamResult::where('student_session_id', $studentSession->id)
             ->whereHas('examSchedule.examination', function ($query) use ($examination) {
                 $query->where('exam_type', 'terminal')
                       ->orWhere('id', $examination->id);
             })
-            ->with(['studentSession.classg', 'studentSession.section', 'examStudent', 'examSchedule.examination', 'subject'])
+            ->with([
+                'studentSession.classg', 
+                'studentSession.section', 
+                'examStudent', 
+                'examSchedule.examination', 
+                'subject' 
+            ])
             ->get();
+
+        $subjectByRoutine = $examination->subjectByRoutine;
     
-        $processedResults = $allExamResults->groupBy('subject_id')->map(function ($subjectResults) use ($examination) {
-            $finalResult = $subjectResults->firstWhere('examSchedule.examination_id', $examination->id);
-            $firstTermResult = $subjectResults->where('examSchedule.examination.exam_type', 'terminal')->first();
-            $secondTermResult = $subjectResults->where('examSchedule.examination.exam_type', 'terminal')->skip(1)->first();
+        $restructuredResults = [];
+        $firstTermResults = [];
+        $secondTermResults = [];
+
+        foreach ($allExamResults as $result) {
+            $subjectId = $result->subject_id;
+            $examType = $result->examSchedule->examination->exam_type;
     
-            if (!$finalResult) {
-                return [];
+            if ($examType === 'terminal') {
+                if (!isset($firstTermResults[$studentSession->id][$subjectId])) {
+                    $firstTermResults[$studentSession->id][$subjectId] = $result;
+                } else {
+                    $secondTermResults[$studentSession->id][$subjectId] = $result;
+                }
+            } else {
+                $restructuredResults[$studentSession->id][$subjectId] = $result;
             }
+        }
     
-            $creditHours = $finalResult->subject->credit_hour ?? 1;
+        $processedResults = [];
+        $totalCreditHours = 0;
+        $totalGradePoints = 0;
     
-            $firstTermTotal = $firstTermResult ? 
-            ( 
-             $firstTermResult->theory_assessment) * 0.05 : 0;
+        foreach ($subjectByRoutine as $subject) {
+            $result = $restructuredResults[$studentSession->id][$subject->id] ?? null;
+            $firstTermResult = $firstTermResults[$studentSession->id][$subject->id] ?? null;
+            $secondTermResult = $secondTermResults[$studentSession->id][$subject->id] ?? null;
 
-         $secondTermTotal = $secondTermResult ? 
-            (
-             $secondTermResult->theory_assessment) * 0.05 : 0;
+            $creditHours = $result->subject->credit_hour ?? 1;
 
-        $internalMarks = $firstTermTotal + $secondTermTotal +
-                        $finalResult->participant_assessment +
-                        $finalResult->practical_assessment;
 
-            $theoryMarks = ($finalResult->theory_assessment / 100) * 50;
-            $totalMarks = $internalMarks + $theoryMarks;
     
-            $allZero = ($finalResult->participant_assessment == 0 && 
-                        $finalResult->practical_assessment == 0 && 
-                        $finalResult->theory_assessment == 0 &&
-                        $firstTermTotal == 0 && $secondTermTotal == 0);
+            if ($result) {
+                $firstTermTotal = $firstTermResult ? $firstTermResult->theory_assessment * 0.05 : 0;
+                $secondTermTotal = $secondTermResult ? $secondTermResult->theory_assessment * 0.05 : 0;
     
-            $gradeInfo = $this->getGradeInfoFinal($totalMarks, $allZero);
-            $subjectGPA = $allZero ? 0 : $this->getSubjectGPAFinal($totalMarks);
+                $internalMarks = $firstTermTotal + $secondTermTotal +
+                                 $result->participant_assessment +
+                                 $result->practical_assessment;
     
-            return [
-                'subject_name' => $finalResult->subject->subject ?? 'Unknown Subject',
-                'credit_hour' => $creditHours,
-                'theory_assessment' => round($theoryMarks, 2),
-                'internal_assessment' => round($internalMarks, 2),
-                'total' => round($totalMarks, 2),
-                'grade' => $gradeInfo,
-                'grade_point' => $subjectGPA,
-                'all_zero' => $allZero,
-            ];
-        });
+                $theoryMarks = $result->theory_assessment * 0.5;
+                $totalMarks = $internalMarks + $theoryMarks;
     
-        $gpa = $this->calculateGPA($processedResults);
+                $allZero = ($result->participant_assessment == 0 &&
+                            $result->practical_assessment == 0 &&
+                            $result->theory_assessment == 0 &&
+                            $firstTermTotal == 0 && $secondTermTotal == 0);
+    
+                $gradeInfo = $this->getGradeInfoFinal($totalMarks, $allZero);
+                $gpa = $allZero ? 0 : $this->calculateGPAFinal($totalMarks);
+    
+                $totalCreditHours += $creditHours;
+                $totalGradePoints += $gpa * $creditHours;
+    
+                $processedResults[$subject->id] = [
+                    'subject_name' => $result->subject->subject ?? 'Unknown Subject',
+                    'credit_hour' => $creditHours,
+                    'internal_marks' => number_format($internalMarks, 2),
+                    'theory_marks' => number_format($theoryMarks, 2),
+                    'total_marks' => number_format($totalMarks, 2),
+                    'gpa' => number_format($gpa, 2),
+                    'grade' => $gradeInfo,
+                    'all_zero' => $allZero,
+                ];
+            } else {
+                $processedResults[$subject->id] = [
+                    'subject_name' => $subject->subject ?? 'Unknown Subject',
+                    'credit_hour' => $creditHours,
+                    'internal_marks' => 'N/A',
+                    'theory_marks' => 'N/A',
+                    'total_marks' => 'N/A',
+                    'gpa' => 'N/A',
+                    'grade' => ['grade_name' => 'NG', 'achievement_description' => 'Not Graded'],
+                    'all_zero' => true,
+                ];
+            }
+        }
+
+        $overallGPA = $totalCreditHours ? number_format($totalGradePoints / $totalCreditHours, 2) : 0;
     
         return [
             'examResults' => $processedResults,
-            'gpa' => $gpa,
+            'overallGPA' => $overallGPA,
             'className' => $allExamResults->first()->studentSession->classg->class ?? 'Unknown Class',
             'sectionName' => $allExamResults->first()->studentSession->section->section_name ?? 'Unknown Section',
         ];
     }
     
+    
+    private function calculateGPAFinal($totalMarks)
+    {
+        if ($totalMarks > 90) return 4.0;
+        elseif ($totalMarks > 80) return 3.6;
+        elseif ($totalMarks > 70) return 3.2;
+        elseif ($totalMarks > 60) return 2.8;
+        elseif ($totalMarks > 50) return 2.4;
+        elseif ($totalMarks > 40) return 2.0;
+        elseif ($totalMarks > 32) return 1.6;
+        else return 0.0;
+    }
+
+    private function getGradeInfoFinal($totalMarks, $allZero = false)
+    {
+        if ($allZero) {
+            return [
+                'grade_name' => 'NG',
+                'achievement_description' => 'Not Attempted',
+            ];
+        }
+
+        if ($totalMarks > 90) {
+            return ['grade_name' => 'A+', 'achievement_description' => 'Outstanding'];
+        } elseif ($totalMarks > 80) {
+            return ['grade_name' => 'A', 'achievement_description' => 'Excellent'];
+        } elseif ($totalMarks > 70) {
+            return ['grade_name' => 'B+', 'achievement_description' => 'Very Good'];
+        } elseif ($totalMarks > 60) {
+            return ['grade_name' => 'B', 'achievement_description' => 'Good'];
+        } elseif ($totalMarks > 50) {
+            return ['grade_name' => 'C+', 'achievement_description' => 'Satisfactory'];
+        } elseif ($totalMarks > 40) {
+            return ['grade_name' => 'C', 'achievement_description' => 'Acceptable'];
+        } elseif ($totalMarks > 32) {
+            return ['grade_name' => 'D', 'achievement_description' => 'Partially Acceptable'];
+        } else {
+            return ['grade_name' => 'NG', 'achievement_description' => 'Not Graded'];
+        }
+    }
 
 private function getSubjectGPA($totalMarks)
 {
@@ -527,6 +554,71 @@ private function getSubjectGPAFinal($totalMarks)
             elseif ($totalMarks > 40) return 2.0;
             elseif ($totalMarks > 32) return 1.6;
             else return 0.0;
+}
+public function bulkDownloadMarksheets(Request $request)
+{
+    $studentIds = explode(',', $request->input('student_ids'));
+    $classId = $request->input('class_id');
+    $sectionId = $request->input('section_id');
+    $marksheetDesignId = $request->input('marksheet_design_id');
+    $examinationId = $request->input('examination_id');
+
+    $zip = new \ZipArchive();
+    $zipFileName = 'marksheets.zip';
+    $zipFilePath = storage_path('app/public/' . $zipFileName);
+
+    if ($zip->open($zipFilePath, \ZipArchive::CREATE) !== TRUE) {
+        return response()->json(['error' => 'Unable to create zip file'], 100);
+    }
+
+    foreach ($studentIds as $studentId) {
+        try {
+            $pdf = $this->generateStudentMarksheetPDF($studentId, $classId, $sectionId, $marksheetDesignId, $examinationId);
+            $pdfFileName = 'marksheet_' . $studentId . '.pdf';
+            $zip->addFromString($pdfFileName, $pdf);
+        } catch (\Exception $e) {
+            Log::error('Error generating PDF for student ' . $studentId . ': ' . $e->getMessage());
+            continue;
+        }
+    }
+
+    $zip->close();
+
+    return response()->download($zipFilePath)->deleteFileAfterSend(true);
+}
+
+private function generateStudentMarksheetPDF($studentId, $classId, $sectionId, $marksheetDesignId, $examinationId)
+{
+    $school = School::findOrFail(session('school_id'));
+    $marksheet = MarkSheetDesign::findOrFail($marksheetDesignId);
+    $examinations = Examination::findOrFail($examinationId);
+    $studentSession = StudentSession::with('user')->findOrFail($studentId);
+    $student = $studentSession->user;
+    $studentDetails = Student::where('user_id', $studentSession->user_id)->firstOrFail();
+
+    if ($examinations->exam_type == 'terminal') {
+        $data = $this->processTerminalExam($studentSession, $examinations);
+    } else {
+        $data = $this->processFinalExam($studentSession, $examinations);
+    }
+
+    $data = array_merge($data, [
+        'marksheet' => $marksheet,
+        'student' => $student,
+        'studentDetails' => $studentDetails,
+        'examinations' => $examinations,
+        'school' => $school,
+        'markgrades' => MarksGrade::all(),
+        'today' => Carbon::today(),
+    ]);
+
+    $view = $examinations->exam_type == 'terminal' 
+        ? 'backend.school_admin.mark_sheet_design.downloadmarksheetterminal'
+        : 'backend.school_admin.mark_sheet_design.downloadmarksheetfinal';
+
+    $html = view($view, $data)->render();
+
+    return Browsershot::html($html)->pdf();
 }
 
 }

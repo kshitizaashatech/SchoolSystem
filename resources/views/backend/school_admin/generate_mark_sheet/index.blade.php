@@ -169,8 +169,12 @@
                             <div class="report-table-container">
                                 <div class="table-responsive">
                                     <table id="student-table" class="table table-bordered table-striped dataTable dtr-inline" aria-describedby="example1_info">
+                                        <button id="bulk-download-btn" class="btn btn-primary mt-3" style="display: none;">Bulk Download</button>
                                         <thead>
                                             <tr>
+                                                <th>
+                                                   Select All <input type="checkbox" id="select-all-checkbox">
+                                                </th>
                                                 <th>Id</th>
                                                 <th>First Name</th>
                                                 <th>Last Name</th>
@@ -195,9 +199,8 @@
 
         <div id="ajax_response"></div>
     </div>
-@endsection
-
-@section('scripts')
+    @endsection
+    @section('scripts')
 <script>
 $(document).ready(function() {
     $.ajaxSetup({
@@ -217,9 +220,20 @@ $(document).ready(function() {
                 d.section_id = $('select[name="section_id"]').val();
                 d.marksheet_design_id = $('select[name="marksheet_design_id"]').val();
                 d.examination_id = $('select[name="examination_id"]').val();
+            },
+            error: function (xhr, error, thrown) {
+                console.error('DataTables AJAX error:', error);
             }
         },
         columns: [
+            {
+                data: null,
+                render: function (data, type, row) {
+                    return '<input type="checkbox" class="student-checkbox" data-student-id="' + row.id + '">';
+                },
+                orderable: false,
+                searchable: false
+            },
             {data: 'id', name: 'id'},
             {data: 'f_name', name: 'f_name'},
             {data: 'l_name', name: 'l_name'},
@@ -252,10 +266,67 @@ $(document).ready(function() {
                         data-examination-id="${$('select[name="examination_id"]').val()}">
                         <i class="fas fa-download" title="Download"></i>
                         </a>`;
-                    }
-
-             }
+                }
+            }
         ],
+        drawCallback: function(settings) {
+            console.log('DataTables draw callback', settings);
+        }
+    });
+
+    $('#select-all-checkbox').on('change', function() {
+        $('.student-checkbox').prop('checked', this.checked);
+        updateBulkDownloadButton();
+    });
+
+    $(document).on('change', '.student-checkbox', function() {
+        updateBulkDownloadButton();
+    });
+
+    function updateBulkDownloadButton() {
+        var anyChecked = $('.student-checkbox:checked').length > 0;
+        $('#bulk-download-btn').toggle(anyChecked);
+    }
+
+    $('#bulk-download-btn').on('click', function() {
+        var selectedStudentIds = $('.student-checkbox:checked').map(function() {
+            return $(this).data('student-id');
+        }).get();
+
+        var classId = $('select[name="class_id"]').val();
+        var sectionId = $('select[name="section_id"]').val();
+        var marksheetDesignId = $('select[name="marksheet_design_id"]').val();
+        var examinationId = $('select[name="examination_id"]').val();
+
+
+        alert('Preparing marksheets for download. This may take a moment...');
+
+        $.ajax({
+            url: '{{ route("admin.bulk.download.marksheets") }}',
+            type: 'POST',
+            data: {
+                student_ids: selectedStudentIds.join(','),
+                class_id: classId,
+                section_id: sectionId,
+                marksheet_design_id: marksheetDesignId,
+                examination_id: examinationId
+            },
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function(response) {
+                var blob = new Blob([response]);
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'bulk_marksheets.zip';
+                link.click();
+                alert('Download completed successfully!');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error downloading marksheets:', error);
+                alert('An error occurred while downloading the marksheets. Please try again.');
+            }
+        });
     });
 
     $('#searchButton').on('click', function() {
@@ -290,6 +361,8 @@ $(document).ready(function() {
         var marksheetDesignId = $(this).data('marksheet-design-id');
         var examinationId = $(this).data('examination-id');
 
+        alert('Preparing marksheet for download. This may take a moment...');
+
         var url = '{{ route("admin.downloadstudentmarksheet.get", [":student_id", ":class_id", ":section_id", ":marksheetdesign_id", ":examination_id"]) }}';
         url = url.replace(':student_id', studentId)
                  .replace(':class_id', classId)
@@ -299,11 +372,15 @@ $(document).ready(function() {
 
         window.location.href = url;
     });
-
+});
+</script>
+ {{-- SCRIPT FOR GETTING CLASS AND SECTION --}}
+ <script>
     $('select[name="class_id"]').change(function() {
         var classId = $(this).val();
         console.log('Selected Class ID:', classId);
         $.ajax({
+
             url: '/admin/generate-marksheets/get-sections/' + classId,
             type: 'GET',
             success: function(data) {
@@ -311,7 +388,8 @@ $(document).ready(function() {
                 $('select[name="section_id"]').empty();
                 $('select[name="section_id"]').append('<option disabled>Select Section</option>');
                 $.each(data, function(key, value) {
-                    $('select[name="section_id"]').append('<option value="' + key + '">' + value + '</option>');
+                    $('select[name="section_id"]').append('<option value="' + key + '">' +
+                        value + '</option>');
                 });
             },
             error: function(xhr, status, error) {
@@ -319,6 +397,6 @@ $(document).ready(function() {
             }
         });
     });
-});
 </script>
+
 @endsection

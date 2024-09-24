@@ -19,3 +19,5 @@ Route::post('generate-admitcards/admit-card-design/get', [GenerateAdmitCardContr
 Route::get('generate-admitcards/show-admitcard-design/{student_id}/{admit_card_id}/{examination_id}', [GenerateAdmitCardController::class, 'showAdmitCardDesign'])->name('showadmitcarddesign');
 
 Route::post('generate-admitcards/student/get', [GenerateAdmitCardController::class, 'getAllStudents'])->name('generatestudentsadmitcards.get');
+
+Route::post('generate-admitcards/bulk-download', [GenerateAdmitCardController::class, 'bulkDownloadAdmitCards'])->name('generate-admitcards.bulk-download');

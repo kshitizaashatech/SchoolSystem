@@ -497,7 +497,7 @@
                     </div>
                 </div>
             </div>
-
+    
             <div class="col-xl-3 mb-50">
                 <div class="bg-white box-shadow border-radius-10 height-100-p widget-style1">
                     <div class="d-flex flex-wrap align-items-center">
@@ -511,7 +511,7 @@
                     </div>
                 </div>
             </div>
-
+    
             <div class="col-xl-3 mb-50">
                 <div class="bg-white box-shadow border-radius-10 height-100-p widget-style1">
                     <div class="d-flex flex-wrap align-items-center">
@@ -525,7 +525,7 @@
                     </div>
                 </div>
             </div>
-
+    
             <div class="col-xl-3 mb-50">
                 <div class="bg-white box-shadow border-radius-10 height-100-p widget-style1">
                     <div class="d-flex flex-wrap align-items-center">
@@ -539,6 +539,7 @@
                     </div>
                 </div>
             </div>   
+        </div>
         </div>
         
 
@@ -618,17 +619,17 @@
                 document.addEventListener('DOMContentLoaded', function() {
                     // Class-wise Student Chart
                                 const ctx = document.getElementById('classWiseStudentsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar', // or 'line' or any other chart type
-                data: class_wise_students,
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+                                new Chart(ctx, {
+                                    type: 'bar', // or 'line' or any other chart type
+                                    data: class_wise_students,
+                                    options: {
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true
+                                            }
+                                        }
+                                    }
+                                });
             
                     // Staff by Role Chart
                     const ctxStaff = document.getElementById('staffChart').getContext('2d');
@@ -648,35 +649,35 @@
             
                     // Class-wise Student Attendance Chart
                     const ctxAttendance = document.getElementById('classWiseAttendanceChart').getContext('2d');
-new Chart(ctxAttendance, {
-    type: 'bar',
-    data: class_wise_student_attendances,
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-            
+                    new Chart(ctxAttendance, {
+                        type: 'bar',
+                        data: class_wise_student_attendances,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                                
                     // Staff Attendance Chart
                     const ctxStaffAttendance = document.getElementById('staffAttendanceChart').getContext('2d');
-new Chart(ctxStaffAttendance, {
-    type: 'bar',
-    data: staff_attendance,
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
+                    new Chart(ctxStaffAttendance, {
+                        type: 'bar',
+                        data: staff_attendance,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
                 });
             </script>
         @endsection

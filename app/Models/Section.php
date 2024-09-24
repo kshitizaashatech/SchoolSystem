@@ -22,7 +22,8 @@ class Section extends Model
 
     public function classes()
     {
-        return $this->belongsTo(Classg::class, 'class_sections', 'class_id');
+        return $this->belongsToMany(Classg::class, 'class_sections', 'section_id', 'class_id')
+                    ->withPivot('school_id');
     }
     public function studentLeaves()
     {

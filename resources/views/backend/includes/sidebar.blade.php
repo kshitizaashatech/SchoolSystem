@@ -44,6 +44,7 @@
                 @include('backend.includes.sidebar.user_management')
 
                 @include('backend.includes.sidebar.ECA_activities_management')
+                @include('backend.includes.sidebar.Notice_management')
                 @include('backend.includes.sidebar.attendence_reports')
             </ul>
         </div>

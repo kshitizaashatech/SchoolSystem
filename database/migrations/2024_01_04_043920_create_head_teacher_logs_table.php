@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('head_teacher_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('major_incidents')->nullable();
-            $table->string('major_work_observation')->nullable();
-            $table->string('assembly_management')->nullable();
-            $table->string('miscellaneous')->nullable();
-            $table->string('logged_date')->nullable();
+            $table->text('major_incidents')->nullable();
+            $table->text('major_work_observation')->nullable();
+            $table->text('assembly_management')->nullable();
+            $table->text('miscellaneous')->nullable();
+            $table->text('logged_date')->nullable();
             $table->timestamps();
         });
     }

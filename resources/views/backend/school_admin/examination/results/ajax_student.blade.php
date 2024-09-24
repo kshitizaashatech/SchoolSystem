@@ -52,8 +52,9 @@
                             <input type="number" class="theory_assessment form-control" name="theory_assessment[{{ $index }}]" value="{{ $examStudent->theory_assessment ?? '' }}" step="any">
                         </td>
                         <td>
-                            <input type="text" class="form-control note" name="notes[]" value="{{ $examStudent->notes ?? '' }}">
+                            <input type="text" class="form-control note" name="notes[]" value="{{ $examStudent->notes ?? '' }}" style="width: 250px;">
                         </td>
+                        
                     </tr>
                 @empty
                     <tr>

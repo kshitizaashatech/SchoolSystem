@@ -12,6 +12,7 @@ use App\Http\Services\FormService;
 use App\Http\Controllers\Controller;
 use App\Http\Services\StudentUserService;
 use Yajra\Datatables\Datatables;
+use ZipArchive;
 
 class GenerateAdmitCardController extends Controller
 {
@@ -253,5 +254,56 @@ class GenerateAdmitCardController extends Controller
             ->get();
 
         return $dataTableQuery;
+    }
+
+    public function bulkDownloadAdmitCards(Request $request)
+    {
+        $studentIds = $request->input('student_ids');
+        $admitCardId = $request->input('admit_card_id');
+        $examinationId = $request->input('examination_id');
+    
+        $zipFileName = 'bulk_admit_cards.zip';
+        $zip = new ZipArchive;
+    
+        if ($zip->open(public_path($zipFileName), ZipArchive::CREATE) === TRUE) {
+            foreach ($studentIds as $studentId) {
+                $pdfContent = $this->generateAdmitCardPDF($studentId, $admitCardId, $examinationId);
+                $zip->addFromString("admit_card_student_{$studentId}.pdf", $pdfContent);
+            }
+            $zip->close();
+        }
+    
+        return response()->download(public_path($zipFileName))->deleteFileAfterSend(true);
+    }
+    
+    private function generateAdmitCardPDF($student_id, $admit_card_id, $examination_id)
+    {
+        $student = Student::with('user')->findOrFail($student_id);
+        $admitCard = AdmitCardDesign::findOrFail($admit_card_id);
+        $examination = Examination::findOrFail($examination_id);
+        $examSchedule = Examination::findOrFail($examination_id)->examSchedules;
+    
+        $base64EncodedImageRight = $this->generateBase64EncodedImage($admitCard->right_logo);
+        $base64EncodedImageLeft = $this->generateBase64EncodedImage($admitCard->left_logo);
+        $base64EncodedBackgroundImage = $this->generateBase64EncodedImage($admitCard->background_img);
+    
+        $html = view('backend.school_admin.admit_card_design.ajax_admitcard', [
+            'student' => $student,
+            'admitCard' => $admitCard,
+            'examination' => $examination,
+            'examSchedule' => $examSchedule,
+            'base64EncodedImageRight' => $base64EncodedImageRight,
+            'base64EncodedImageLeft' => $base64EncodedImageLeft,
+            'base64EncodedBackgroundImage' => $base64EncodedBackgroundImage,
+            'isPdfDownload' => true
+        ])->render();
+    
+        $options = new \Dompdf\Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+    
+        $dompdf->render();
+        return $dompdf->output();
     }
 }

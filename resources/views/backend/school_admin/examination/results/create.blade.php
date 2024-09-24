@@ -10,6 +10,8 @@
                     {{ $page_title }}
                 </h2>
             </div>
+            <a href="{{ url()->previous() }}"><button class="btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>
+                Back</button></a>
 
         </div>
         <div class="card mb-2">

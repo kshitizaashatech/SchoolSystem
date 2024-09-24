@@ -39,10 +39,10 @@
 @endcan
 
 {{-- PRINT MARKSHEET BUTTON --}}
-<a href="{{ route('admin.generate.marksheets.create', ['examination_id' => $examination->id]) }}"
+{{-- <a href="{{ route('admin.generate.marksheets.create', ['examination_id' => $examination->id]) }}"
     class="btn btn-outline-secondary btn-sm mx-1" data-toggle="tooltip" data-placement="top" title="Print Marksheet">
     <i class="fas fa-print"></i>
-</a>
+</a> --}}
 
 
 @can('create_exam_routines')

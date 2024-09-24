@@ -97,12 +97,26 @@
             font-family: 'Algeria', sans-serif;
             font-size: 40px;
         }
+
+        #printButton {
+            position: relative;
+            top: 10px;
+            right: 20px;
+        }
+
+        @media print {
+            #printButton {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
 <body>
+ 
     <section class="gradesheet">
         <div class="container">
+            <button id="printButton" class="btn btn-primary">Print Gradesheet</button>
             <div class="gradesheet_design">
                 <div class="row gradesheet_head">
                     <div class="col-2">
@@ -316,6 +330,14 @@
             </div>
         </div>
     </section>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('printButton').addEventListener('click', function() {
+            window.print();
+        });
+    </script>
 </body>
 
 </html>

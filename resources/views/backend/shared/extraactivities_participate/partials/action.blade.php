@@ -6,13 +6,5 @@
                     class="fa fa-list"></i></button></a>
     @endcan
 
-    @can('create_eca_activities')
-        <a href="#">
-            <button type="button" class="btn btn-block btn-success btn-sm" data-bs-toggle="modal"
-                data-bs-target="#createEcaActivity">
-                Add ExtraCurricular Activities <i class="fas fa-plus"></i>
-            </button>
-           
-        </a>
-    @endcan
+    
 </div>
