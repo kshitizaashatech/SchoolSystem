@@ -112,26 +112,26 @@ class SchoolController extends Controller
             'email' => 'required|unique:users,email',
             'is_active' => 'required',
         ]);
-    
+
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-    
+
         try {
             // Begin transaction
             DB::beginTransaction();
-    
-              // Handle file upload for logo
-        if ($request->hasFile('logo')) {
-            $logo = $request->file('logo');
-            $newLogoName = time() . '.' . $logo->getClientOriginalName();
-            $logoPath = 'uploads/schoollogo/';
-            $logo->move(public_path($logoPath), $newLogoName);
-            $fullLogoPath = $logoPath . $newLogoName;
-        } else {
-            throw new \Exception('Logo file not found.');
-        }
-    
+
+            // Handle file upload for logo
+            if ($request->hasFile('logo')) {
+                $logo = $request->file('logo');
+                $newLogoName = time() . '.' . $logo->getClientOriginalName();
+                $logoPath = 'uploads/schoollogo/';
+                $logo->move(public_path($logoPath), $newLogoName);
+                $fullLogoPath = $logoPath . $newLogoName;
+            } else {
+                throw new \Exception('Logo file not found.');
+            }
+
             // Create the school record
             $school = School::create([
                 'state_id' => $request->state_id,
@@ -144,10 +144,10 @@ class SchoolController extends Controller
                 'address' => $request->address,
                 'phone_number' => $request->phone_number,
                 'logo' => $fullLogoPath, // Store the image filename in 'logo' column
-                'email' =>$request->email,
+                'email' => $request->email,
                 'is_active' => $request->is_active,
             ]);
-    
+
             if ($school) {
                 // Create the user associated with the school
                 $user = new User();
@@ -167,7 +167,7 @@ class SchoolController extends Controller
                 $user->local_address = $school->address;
                 $user->is_active = $request->is_active;
                 $user->save();
-    
+
                 if ($user) {
                     $user->assignRole(5); // Assign role if using a role management system
                     SchoolUser::create([
@@ -175,7 +175,7 @@ class SchoolController extends Controller
                         'user_id' => $user->id
                     ]);
                 }
-    
+
                 DB::commit();
                 return redirect()->back()->withToastSuccess('School Successfully Registered!');
             }
@@ -417,5 +417,20 @@ class SchoolController extends Controller
 
         // dd($dataTableQuery);
         return $dataTableQuery;
+    }
+    // reset password function 
+    public function resetPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+
+        $user = User::where('school_id', $id)->firstOrFail();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->back()->withToastSuccess('Password reset successfully!');
+
     }
 }
