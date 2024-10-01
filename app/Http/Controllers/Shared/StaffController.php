@@ -59,29 +59,34 @@ class StaffController extends Controller
     }
 
     public function create()
-{
-    $page_title = 'Staff Create Form';
-    $departments = Department::all();
-    $roles = Role::whereIn('name', ['Teacher', 'Accountant', 'Librarian', 'Principal', 'Receptionist','Helper'])->get();
-    $states = $this->formService->getProvinces();
-    $adminStateId = Auth::user()->state_id;
-    $adminDistrictId = Auth::user()->district_id;
-    $adminMunicipalityId = Auth::user()->municipality_id;
+    {
+        $page_title = 'Staff Create Form';
+        $departments = Department::all();
+        $roles = Role::whereIn('name', ['Teacher', 'Accountant', 'Librarian', 'Principal', 'Receptionist', 'Helper'])->get();
+        $states = $this->formService->getProvinces();
+        $adminStateId = Auth::user()->state_id;
+        $adminDistrictId = Auth::user()->district_id;
+        $adminMunicipalityId = Auth::user()->municipality_id;
 
-    $schoolId = Auth::user()->school_id; 
+        $schoolId = Auth::user()->school_id;
 
-    return view('backend.shared.staffs.create', compact(
-        'page_title', 'states', 'roles', 'departments',
-        'adminStateId', 'adminMunicipalityId', 'adminDistrictId',
-        'schoolId'
-    ));
-}
+        return view('backend.shared.staffs.create', compact(
+            'page_title',
+            'states',
+            'roles',
+            'departments',
+            'adminStateId',
+            'adminMunicipalityId',
+            'adminDistrictId',
+            'schoolId'
+        ));
+    }
 
 
-public function show($id)
-{
-    
-}
+    public function show($id)
+    {
+
+    }
     // CREATE STAFF
     protected function saveStaff(array $staffInput)
     {
@@ -136,10 +141,10 @@ public function show($id)
                 'marital_status' => 'nullable',
             ];
 
-    }
+        }
 
-    return $request->validate($rules);
-  }
+        return $request->validate($rules);
+    }
 
 
     protected function saveUserImage($croppedImage)
@@ -321,9 +326,9 @@ public function show($id)
             $validatedUserData = $this->validateUserData($request);
             $validatedStaffData = $this->validateUserData($request, true);
             $staff = Staff::findOrFail($id);
-    
+
             DB::beginTransaction();
-    
+
             if ($staff->user) {
                 if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
                     $userInput['image'] = $this->saveUserImage($request->input('inputCroppedPic'));
@@ -342,9 +347,9 @@ public function show($id)
                     $staff->user->update(['role_id' => $request->role]);
                 }
             }
-    
+
             DB::commit();
-    
+
             return redirect()->route('admin.staffs.index')->withToastSuccess('Staff successfully Updated');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -376,7 +381,7 @@ public function show($id)
                 return $row->l_name;
             })
             ->editColumn('marital_status', function ($row) {
-                return $row->marital_status ; 
+                return $row->marital_status;
             })
             ->editColumn('date_of_joining', function ($row) {
                 return $row->date_of_joining;
@@ -427,7 +432,7 @@ public function show($id)
         $leave = 'Add Leave Details';
         $type = $request->query('type');
         $staffId = $request->query('staff_id');
-        
+
         return view('backend.shared.staffs.leavedetails', compact('leave', 'type', 'staffId'));
     }
 
@@ -453,9 +458,9 @@ public function show($id)
     public function addResignationDetails(Request $request)
     {
         $page_title = 'Add Resignation Details';
-        $type= $request->query('type');
-        $staffId= $request->query('staff_id');
-        return view('backend.shared.staffs.resignationdetails', compact('page_title','type','staffId'));
+        $type = $request->query('type');
+        $staffId = $request->query('staff_id');
+        return view('backend.shared.staffs.resignationdetails', compact('page_title', 'type', 'staffId'));
     }
 
     public function storeResignationDetails(Request $request)
@@ -478,21 +483,21 @@ public function show($id)
             // Begin a database transaction
             DB::beginTransaction();
             $array1 = Excel::toCollection(new CombinedImport, $request->file('file'));
-    
+
             // Access the outer collection
             foreach ($array1 as $outerCollection) {
                 // Iterate through the inner collections
                 foreach ($outerCollection as $row) {
-    
+
                     $data = $row->toArray();
-    
+
                     // Ensure 'marital_status' key exists and standardize its value
                     if (!array_key_exists('marital_status', $data)) {
                         $data['marital_status'] = null;
                     } else {
                         $data['marital_status'] = trim(strtolower($data['marital_status']));
                     }
-    
+
                     $validator = Validator::make($data, [
                         'state_id' => 'required',
                         'district_id' => 'required',
@@ -512,29 +517,29 @@ public function show($id)
                         'emergency_contact_phone' => 'required',
                         'marital_status' => 'nullable', // Allow marital_status to be nullable
                     ]);
-    
+
                     if ($validator->fails()) {
                         // Redirect back with validation errors
                         return redirect()->back()->withErrors($validator)->withInput();
                     }
-    
+
                     // Extract role id from name
                     $role_id = $this->roleIdentification($data['role']);
                     if ($role_id == null) {
                         return redirect()->back()->withErrors('Invalid Role name of : ' . $data['f_name'])->withInput();
                     }
-    
+
                     // Extract department id from name
                     $department_id = $this->departmentIdentification($data['department']);
                     if ($department_id == null) {
                         return redirect()->back()->withErrors('Invalid Department name of : ' . $data['f_name'])->withInput();
                     }
-    
+
                     $marriedId = $this->maritialStatus($data['marital_status']);
                     if ($marriedId === null && $data['marital_status'] !== null) {
                         return redirect()->back()->withErrors('Invalid Marital Status of : ' . $data['f_name'])->withInput();
                     }
-    
+
                     $staffUser = User::create([
                         'user_type_id' => 6,
                         'role_id' => $role_id,
@@ -561,7 +566,7 @@ public function show($id)
                         'emergency_contact_person' => $data['emergency_contact_person'],
                         'emergency_contact_phone' => $data['emergency_contact_phone'],
                     ]);
-    
+
                     // CREATE staff
                     $studentCreate = Staff::create([
                         'user_id' => $staffUser->id,
@@ -590,7 +595,7 @@ public function show($id)
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-    
+
 
     public function roleIdentification($role_name)
     {
@@ -658,7 +663,7 @@ public function show($id)
     {
         // Trim whitespace and convert to lowercase for standardization
         $status = trim(strtolower($status));
-    
+
         // Define possible statuses in an associative array
         $statuses = [
             'married' => 1,
@@ -667,17 +672,40 @@ public function show($id)
             'widow' => 3,
             'separated' => 4,  // Corrected spelling from 'separeted'
         ];
-    
+
         // Check if the status exists in the array and return the corresponding value
         $maritalStatus = $statuses[$status] ?? null;
-    
+
         echo $status; // Debugging: print the standardized status
         echo ($maritalStatus); // Debugging: print the marital status id
-    
+
         return $maritalStatus;
     }
-    
+    public function resetPassword(Request $request, $id)
+    {
+        // Validate the request
+        $request->validate([
+            'password' => 'required|min:6|confirmed',
+        ]);
 
+        try {
+            // Find the staff by ID
+            $staff = Staff::findOrFail($id);
 
+            // Ensure the related User model exists
+            if ($staff->user) {
+                // Hash and update the new password in the related user model
+                $staff->user->password = Hash::make($request->password);
+                $staff->user->save();
+
+                return redirect()->route('admin.staffs.index')->withToastSuccess('Password reset successfully!');
+            } else {
+                return back()->withToastError('No associated user found for the selected staff.');
+            }
+        } catch (\Exception $e) {
+            // Handle any exceptions and display the error message
+            return back()->withToastError($e->getMessage())->withInput();
+        }
+    }
 }
 

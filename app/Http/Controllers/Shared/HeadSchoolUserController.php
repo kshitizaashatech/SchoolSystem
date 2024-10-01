@@ -77,7 +77,8 @@ class HeadSchoolUserController extends Controller
                 return redirect()->back()->withToastSuccess('Head School User Successfully Registered!');
             }
         } catch (\Exception $e) {
-            return back()->withToastError($e->getMessage())->withInput();;
+            return back()->withToastError($e->getMessage())->withInput();
+            ;
         }
     }
 
@@ -160,7 +161,7 @@ class HeadSchoolUserController extends Controller
         }
     }
 
-        /**
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
@@ -235,8 +236,26 @@ class HeadSchoolUserController extends Controller
         return $dataTableQuery;
     }
 
+    public function resetPassword(Request $request)
+    {
+        // Validate the password input
+        $request->validate([
+            'password' => 'required|min:6|confirmed',
+        ]);
 
+        try {
+            // Get the authenticated user
+            $user = Auth::user();
 
+            // Update the user's password
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return redirect()->back()->withToastSuccess('Password reset successfully!');
+        } catch (\Exception $e) {
+            return back()->withToastError($e->getMessage());
+        }
+    }
 
 
 }

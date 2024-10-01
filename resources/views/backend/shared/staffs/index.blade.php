@@ -57,7 +57,42 @@
                 </div>
             </div>
         </div>
-
+        <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="resetPasswordForm" method="POST"
+                   action="">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" id="schoolId" name="school_id">
+                        <div class="form-group">
+                            <label for="password"> Create a new password</label>
+                            <input type="password" class="form-control" id="password" minlength="6" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password_confirmation">Confirm a new password</label>
+                            <input type="password" class="form-control" id="password_confirmation"
+                                name="password_confirmation" minlength="6" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="togglePasswordVisibility"> Show Password
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                        <button type="submit" class="btn btn-primary">Reset Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     </div>
 
@@ -178,6 +213,59 @@
 
             });
         });
+
+        $(document).on('click', '.reset-password-btn', function () {
+        var schoolId = $(this).data('id');
+        $('#schoolId').val(schoolId);  // Set school ID in the hidden input field
+        $('#resetPasswordForm').attr('action', '/admin/schools/reset-password/' + schoolId);  // Set form action dynamically
+        $('#resetPasswordModal').modal('show');  // Show the modal
+    });
+
+    // Toggle password visibility
+    $('#togglePasswordVisibility').on('change', function () {
+        var passwordField = $('#password');
+        var confirmPasswordField = $('#password_confirmation');
+        if ($(this).is(':checked')) {
+            passwordField.attr('type', 'text');
+            confirmPasswordField.attr('type', 'text');
+        } else {
+            passwordField.attr('type', 'password');
+            confirmPasswordField.attr('type', 'password');
+        }
+    });
+
+    $('#resetPasswordForm').on('submit', function () {
+        e.preventDefault();
+
+        var form = $(this);
+        var actionUrl = form.attr('action');
+
+        // Check if the form action is set correctly
+        //console.log(actionUrl);
+
+        $.ajax({
+            url: actionUrl,
+            method: 'POST',
+            data: form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    $('#resetPasswordModal').modal('hide'); // Close the modal
+                    location.reload(); // Reload the page to show the flash message
+                } else {
+                    alert(response.message);
+                }
+            },
+            // error: function (xhr) {
+            //     console.log(xhr); // Check the console for any error messages.
+            //     xhr.responseJSON && xhr.responseJSON.errors {
+            //         var errors = xhr.responseJSON.errors;
+            //         var message = errors.password ? errors.password[0] : 'Validation error';
+            //         alert(message);
+            //     }
+                
+            // }
+        });
+    });
     </script>
     {{-- <script>
     $(document).ready(function() {

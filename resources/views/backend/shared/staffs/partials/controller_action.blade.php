@@ -37,6 +37,7 @@
 <a href="{{ route('admin.staffs.resignationdetails', ['type' => 'resignation', 'staff_id' => $staff->id]) }}" class="btn btn-outline-warning btn-sm mx-1" data-toggle="tooltip" data-placement="top" title="Add Resignation Details">
     <i class="fas fa-user-plus"></i>
 </a>
+<button type="button" class="btn btn-warning btn-sm reset-password-btn" data-id="{{ $staff->id }}">Reset</button>
 @endcan
 
 

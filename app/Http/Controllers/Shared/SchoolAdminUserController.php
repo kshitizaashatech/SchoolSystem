@@ -199,5 +199,5 @@ class SchoolAdminUserController extends Controller
 
         return $dataTableQuery;
     }
-
+    
 }

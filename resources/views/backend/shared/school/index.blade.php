@@ -181,7 +181,7 @@
         var actionUrl = form.attr('action');
 
         // Check if the form action is set correctly
-        console.log(actionUrl);
+        //console.log(actionUrl);
 
         $.ajax({
             url: actionUrl,

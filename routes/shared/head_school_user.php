@@ -7,6 +7,7 @@ Route::post('head-schoolusers/get', [ HeadSchoolUserController::class, 'getAllHe
 
 Route::get('/head-schoolusers/get-school-details/{id}', [ HeadSchoolUserController::class, 'getSchoolDetails' ]);
 
+Route::post('/reset-password', [HeadSchoolUserController::class, 'resetPassword'])->name('head_school_users.reset_password');
 
 
 
